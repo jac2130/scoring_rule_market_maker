@@ -44,9 +44,15 @@ class Market(object):
         """
         contract: dict
         q: float
-        user: str #this is the user id
+        user: dict #this is the user object
         """
-        pass
+        c = [cont for cont in self.contracts if cont["title"]==contract].pop()
+        c["q"]+=q #here, the contract should be updated in the database
+        user["events"][self.title]["contracts"][contract] += q
+        user["account"] -= self.query_cost(contract, q)
+        #update user here
+        return {"new_q": c["q"], contract : user["events"][self.title]["contracts"][contract]}
+    
     
     def price(self, contract):
         b = self.b
@@ -57,13 +63,23 @@ class Market(object):
         return e**(qi/b)/sum([e**(q/b) for q in quantities])
     
 def main():
+    user = {"id": 12345, "events":{"Will I become a billionair in five years?":{"contracts":{"yes":20, "no":0}}}}
+
+    user["account"]=500
+    
     market =Market("Will I become a billionair in five years?",
                    [{"title":"yes", "q":300}, {"title":"no", "q":700}],
                    100)
-    
+
+    print "user shares: " + str(user)
     print "price of 10 shares of no: " + str(market.query_cost("no", 10))
     
     print "yes price: " + str(market.price("yes"))
     print "no price: " + str(market.price("no"))
+    print "buying with user: " +str(market.buy("yes", 20, user))
+    print "price of 20 shares of yes: " + str(market.query_cost("yes", 20))
+    
+    print "user account: " + str(user)
+    
 if __name__=="__main__":
     main()
