@@ -80,6 +80,8 @@ def main():
     print "price of 20 shares of yes: " + str(market.query_cost("yes", 20))
     
     print "user account: " + str(user)
+    print "yes price: " + str(market.price("yes"))
+    print "no price: " + str(market.price("no"))
     
 if __name__=="__main__":
     main()
