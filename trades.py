@@ -47,14 +47,23 @@ class Market(object):
         user: str #this is the user id
         """
         pass
-
+    
+    def price(self, contract):
+        b = self.b
+        c = [cont for cont in self.contracts if cont["title"]==contract].pop()
+        index = self.contracts.index(c)
+        quantities = [float(contract["q"]) for contract in self.contracts]
+        qi = quantities[index]
+        return e**(qi/b)/sum([e**(q/b) for q in quantities])
     
 def main():
     market =Market("Will I become a billionair in five years?",
                    [{"title":"yes", "q":300}, {"title":"no", "q":700}],
                    100)
     
-    print market.query_cost("no", 1)
-
+    print "price of 10 shares of no: " + str(market.query_cost("no", 10))
+    
+    print "yes price: " + str(market.price("yes"))
+    print "no price: " + str(market.price("no"))
 if __name__=="__main__":
     main()
