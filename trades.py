@@ -53,6 +53,8 @@ class Market(object):
         #update user here
         return {"new_q": c["q"], contract : user["events"][self.title]["contracts"][contract]}
     
+    def sell(self, contract, q, user):
+        return self.buy(contract, -q, user)
     
     def price(self, contract):
         b = self.b
@@ -79,6 +81,11 @@ def main():
     print "buying with user: " +str(market.buy("yes", 20, user))
     print "price of 20 shares of yes: " + str(market.query_cost("yes", 20))
     
+    print "user account: " + str(user)
+    print "yes price: " + str(market.price("yes"))
+    print "no price: " + str(market.price("no"))
+    print "price of selling 20 shares of no: " + str(-market.query_cost("no", -20))
+    print "selling no with user: " +str(market.sell("no", 20, user))
     print "user account: " + str(user)
     print "yes price: " + str(market.price("yes"))
     print "no price: " + str(market.price("no"))
