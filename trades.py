@@ -1,13 +1,14 @@
 from numpy import log as ln
 from numpy import e
-from math import ceil
+from math import ceil, floor
 
 def round_up(cont_money):
     cents =cont_money*100
     return int(ceil(cents))
 
 def round_down(cont_money):
-    return int(round(cont_money)*100)
+    cents = cont_money*100
+    return int(floor(cents))
 
 class Market(object):
     """
@@ -86,17 +87,17 @@ def main():
                    100)
 
     print "user shares: " + str(user)
-    print "price of 10 shares of no: " + str(market.query_cost("no", 10))
+    print "price of 10 shares of no: " + str(market.query_cost("no", 10)/100.0)
 
     print "yes price: " + str(market.price("yes"))
     print "no price: " + str(market.price("no"))
     print "buying with user: " +str(market.buy("yes", 20, user))
-    print "price of 20 shares of yes: " + str(market.query_cost("yes", 20))
+    print "price of 20 shares of yes: " + str(market.query_cost("yes", 20)/100.0)
 
     print "user account: " + str(user)
     print "yes price: " + str(market.price("yes"))
     print "no price: " + str(market.price("no"))
-    print "price of selling 20 shares of no: " + str(-market.query_cost("no", -20))
+    print "price of selling 20 shares of no: " + str(-market.query_cost("no", -20)/100.0)
     print "selling no with user: " +str(market.sell("no", 20, user))
     print "user account: " + str(user)
     print "yes price: " + str(market.price("yes"))
