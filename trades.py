@@ -1,6 +1,13 @@
 from numpy import log as ln
 from numpy import e
+from math import ceil
 
+def round_up(cont_money):
+    cents =cont_money*100
+    return int(ceil(cents))
+
+def round_down(cont_money):
+    return int(round(cont_money)*100)
 
 class Market(object):
     """
@@ -39,7 +46,10 @@ class Market(object):
         index = self.contracts.index(c)
         quantities = [float(contract["q"]) for contract in self.contracts]
         quantities[index]+=float(q)
-        return b*ln(sum([e**(q/b) for q in quantities])) - self.cost
+        if q>0:
+            return round_up(b*ln(sum([e**(q/b) for q in quantities])) - self.cost)
+        else:
+            return -round_down(-b*ln(sum([e**(q/b) for q in quantities])) + self.cost)
 
     def buy(self, contract, q, user):
         """
@@ -50,7 +60,7 @@ class Market(object):
         c = [cont for cont in self.contracts if cont["title"]==contract].pop()
         c["q"]+=q #here, the contract should be updated in the database
         user["events"][self.title]["contracts"][contract] += q
-        user["account"] -= self.query_cost(contract, q)
+        user["account"] -= self.query_cost(contract, q)/100.00 #in dollars
         #update user here
         return {"new_q": c["q"], contract : user["events"][self.title]["contracts"][contract]}
 
@@ -64,7 +74,7 @@ class Market(object):
         index = self.contracts.index(c)
         quantities = [float(contract["q"]) for contract in self.contracts]
         qi = quantities[index]
-        return e**(qi/b)/sum([e**(q/b) for q in quantities])
+        return round_up(e**(qi/b)/sum([e**(q/b) for q in quantities]))
 
 def main():
     user = {"id": 12345, "events":{"Will I become a billionair in five years?":{"contracts":{"yes":20, "no":0}}}}
