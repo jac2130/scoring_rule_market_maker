@@ -52,7 +52,6 @@ class Market(object):
         else:
             return -round_down(-b*ln(sum([e**(qi/b) for qi in quantities])) + self.cost)
 
->>>>>>> a40ba7ddb2e41a7031195eb66a5499c6477d9f0a
     def buy(self, contract, q, user):
         """
         contract: dict
@@ -75,15 +74,9 @@ class Market(object):
         c = [cont for cont in self.contracts if cont["title"]==contract].pop()
         index = self.contracts.index(c)
         quantities = [float(contract["q"]) for contract in self.contracts]
-<<<<<<< HEAD
         q = quantities[index]
         return e**(q/b)/sum([e**(qi/b) for qi in quantities])
-    
-=======
-        qi = quantities[index]
-        return round_up(e**(qi/b)/sum([e**(q/b) for q in quantities]))
 
->>>>>>> a40ba7ddb2e41a7031195eb66a5499c6477d9f0a
 def main():
     user = {"id": 12345, "events":{"Will I become a billionair in five years?":{"contracts":{"yes":20, "no":0}}}}
 
