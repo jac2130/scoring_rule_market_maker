@@ -38,7 +38,7 @@ class Market(object):
         index = self.contracts.index(c)
         quantities = [float(contract["q"]) for contract in self.contracts]
         quantities[index]+=float(q)
-        return b*ln(sum([e**(q/b) for q in quantities])) - self.cost  
+        return b*ln(sum([e**(qi/b) for qi in quantities])) - self.cost  
     
     def buy(self, contract, q, user):
         """
@@ -61,8 +61,8 @@ class Market(object):
         c = [cont for cont in self.contracts if cont["title"]==contract].pop()
         index = self.contracts.index(c)
         quantities = [float(contract["q"]) for contract in self.contracts]
-        qi = quantities[index]
-        return e**(qi/b)/sum([e**(q/b) for q in quantities])
+        q = quantities[index]
+        return e**(q/b)/sum([e**(qi/b) for qi in quantities])
     
 def main():
     user = {"id": 12345, "events":{"Will I become a billionair in five years?":{"contracts":{"yes":20, "no":0}}}}
