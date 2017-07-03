@@ -77,6 +77,12 @@ class Market(object):
         q = quantities[index]
         return e**(q/b)/sum([e**(qi/b) for qi in quantities])
 
+    def quantities(self, price_vector):
+         #set one of the quantities (here the first one) to b (a good base number)
+        q1= b = self.b
+        p1 = price_vector[0]
+        return [q1] + [b*ln(e**(q1/b)*(pk/p1)) for pk in price_vector[1:]]
+
 def main():
     user = {"id": 12345, "events":{"Will I become a billionair in five years?":{"contracts":{"yes":20, "no":0}}}}
 
@@ -102,6 +108,9 @@ def main():
     print "user account: " + str(user)
     print "yes price: " + str(market.price("yes"))
     print "no price: " + str(market.price("no"))
+    market2 = Market("how many tweets will I sent before next week?", [{"title": 0}, {"title":10}, {"title":25}, {"title":30}], 10)
+
+    print "quantities from prices (p1=0.1, p2=0.2, p3=0.2, p4=0.5): " + str(market2.quantities([0.1, 0.2, 0.2, 0.5]))
 
 if __name__=="__main__":
     main()
