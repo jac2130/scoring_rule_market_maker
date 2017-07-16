@@ -1,7 +1,9 @@
 from numpy import log as ln
 from numpy import e
 from math import ceil, floor
+import numpy as np
 
+bigBrother = {"account":1000000, "name":"BigBrother"}
 def round_up(cont_money):
     cents =cont_money*100
     return int(ceil(cents))
@@ -83,6 +85,23 @@ class Market(object):
         p1 = price_vector[0]
         return [q1] + [b*ln(e**(q1/b)*(pk/p1)) for pk in price_vector[1:]]
 
+    @property
+    def quants(self):
+        prices =[self.price(contract["title"]) for contract in self.contracts]
+        return self.quantities(prices)
+
+    def equilibriate_quantities(self, price_vector, param=2):
+        bigBrother["events"] = {self.title:{"contracts":{contract["title"]:0 for contract in self.contracts}}}
+
+        while np.abs(sum(np.array(self.quants) - np.array(self.quantities(price_vector)))) > param:
+            diff = np.array(self.quantities(price_vector)) - np.array(self.quants) #the difference of what I should have minus the ones I do have
+            index = list(diff).index(max(diff))
+            if int(max(diff)/2.0) > 0:
+                self.buy(self.contracts[index]["title"], int(max(diff)/2.0), bigBrother)
+            else:
+                break
+        return
+
 def main():
     user = {"id": 12345, "events":{"Will I become a billionair in five years?":{"contracts":{"yes":20, "no":0}}}}
 
@@ -112,5 +131,11 @@ def main():
 
     print "quantities from prices (p1=0.1, p2=0.2, p3=0.2, p4=0.5): " + str(market2.quantities([0.1, 0.2, 0.2, 0.5]))
 
+    #query from predictit has prices:
+    predictit_query = {"yes": 1, "no":99}
+    market.equilibriate_quantities([1, 99])
+    print bigBrother
+    print "yes price: " + str(market.price("yes"))
+    print "no price: " + str(market.price("no"))
 if __name__=="__main__":
     main()
