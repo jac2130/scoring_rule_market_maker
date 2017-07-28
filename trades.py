@@ -2,6 +2,11 @@ from numpy import log as ln
 from numpy import e
 from math import ceil, floor
 import numpy as np
+import os, sys
+sys.path.append("../collectiwise/collectiwise_backend/")
+os.system("export DJANGO_SETTINGS_MODULE=collectiwise_backend.settings")
+
+from collectiwise_core.models import Event, EventVar, Contract, ContractVar
 
 bigBrother = {"account":1000000, "name":"BigBrother"}
 def round_up(cont_money):
