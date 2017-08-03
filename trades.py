@@ -2,13 +2,26 @@ from numpy import log as ln
 from numpy import e
 from math import ceil, floor
 import numpy as np
-import os, sys
-sys.path.append("../collectiwise/collectiwise_backend/")
-os.system("export DJANGO_SETTINGS_MODULE=collectiwise_backend.settings")
+import os, sys, datetime
+from django.core.exceptions import ObjectDoesNotExist
 
-from collectiwise_core.models import Event, EventVar, Contract, ContractVar
+reload(sys)
+sys.setdefaultencoding('utf8')
+from dateutil.parser import parse
 
-bigBrother = {"account":1000000, "name":"BigBrother"}
+sys.path.append("/root/collectiwise/collectiwise_backend/")
+sys.path.append("/root/collectiwise/")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "collectiwise_backend.settings")
+sys.path.append("/root/collectiwise/collectiwise_backend/collectiwise_core/")
+import django
+django.setup()
+sys.path.append("/root")
+
+from collectiwise_core.models import Event, EventVar, Contract, ContractVar, User, UserBalance, UserContract, Purchase
+
+bigBrother = User("Big Brother")
+bigBroBalance = UserBalance(bigBrother, 10000)
+
 def round_up(cont_money):
     cents =cont_money*100
     return int(ceil(cents))
@@ -66,7 +79,9 @@ class Market(object):
         user: dict #this is the user object
         """
         c = [cont for cont in self.contracts if cont["title"]==contract].pop()
-        c["q"]+=q #here, the contract should be updated in the database
+        c["q"]+=q
+
+        #here, the contract should be updated in the database
         user["events"][self.title]["contracts"][contract] += q
         user["account"] -= self.query_cost(contract, q)/100.00 #in dollars
         #update user here
