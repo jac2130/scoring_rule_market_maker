@@ -47,6 +47,7 @@ class Market(object):
         """
         self.title= title
         self.contracts = contracts
+
         self.b = float(b)
 
 
@@ -99,9 +100,13 @@ class Market(object):
         q = quantities[index]
         return e**(q/b)/sum([e**(qi/b) for qi in quantities])
 
-    def quantities(self, price_vector):
+    def quantities(self):
          #set one of the quantities (here the first one) to b (a good base number)
-        q1= b = self.b
+        price_vector = [contract.lastTradePrice for contract in self.contracts]
+        q1= [contract.volume for contract in self.contracts][0]
+        if q1<=0:
+            q1 = self.b
+
         p1 = price_vector[0]
         return [q1] + [b*ln(e**(q1/b)*(pk/p1)) for pk in price_vector[1:]]
 
