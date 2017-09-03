@@ -47,14 +47,13 @@ class Market(object):
         """
         self.title= title
         self.contracts = contracts
-
         self.b = float(b)
-
+        self.volumes = self.quantities
 
     @property
     def cost(self):
         b = self.b
-        quantities = [float(contract["q"]) for contract in self.contracts]
+        quantities = self.quantities
         return b*ln(sum([e**(qi/b) for qi in quantities]))
 
 
@@ -64,9 +63,8 @@ class Market(object):
         q : float
         """
         b = self.b
-        c = [cont for cont in self.contracts if cont["title"]==contract].pop()
-        index = self.contracts.index(c)
-        quantities = [float(contract["q"]) for contract in self.contracts]
+        index = self.contracts.index(contract)
+        quantities = self.quantities
         quantities[index]+=float(q)
         if q>0:
             return round_up(b*ln(sum([e**(qi/b) for qi in quantities])) - self.cost)
@@ -79,14 +77,13 @@ class Market(object):
         q: float
         user: dict #this is the user object
         """
-        c = [cont for cont in self.contracts if cont["title"]==contract].pop()
-        c["q"]+=q
-
+        contract.volume +=q
+        contract.save()
         #here, the contract should be updated in the database
         user["events"][self.title]["contracts"][contract] += q
         user["account"] -= self.query_cost(contract, q)/100.00 #in dollars
         #update user here
-        return {"new_q": c["q"], contract : user["events"][self.title]["contracts"][contract]}
+        return {"new_q": contract.volume, contract : user["events"][self.title]["contracts"][contract.name]}
 
     def sell(self, contract, q, user):
         return self.buy(contract, -q, user)
@@ -94,26 +91,26 @@ class Market(object):
 
     def price(self, contract):
         b = self.b
-        c = [cont for cont in self.contracts if cont["title"]==contract].pop()
-        index = self.contracts.index(c)
-        quantities = [float(contract["q"]) for contract in self.contracts]
+        index = self.contracts.index(contract)
+        quantities = [float(contract.volume) for contract in self.contracts]
         q = quantities[index]
         return e**(q/b)/sum([e**(qi/b) for qi in quantities])
 
+    @property
     def quantities(self):
          #set one of the quantities (here the first one) to b (a good base number)
         price_vector = [contract.lastTradePrice for contract in self.contracts]
         q1= [contract.volume for contract in self.contracts][0]
         if q1<=0:
             q1 = self.b
-
+            self.contracts[0].volume = b
         p1 = price_vector[0]
+        for contract in self.contracts:
+            index=self.contracts.index(contract)
+            if index>0:
+                contract.volume = b*ln(e**(q1/b)*(contract.lastTradePrice/p1))
         return [q1] + [b*ln(e**(q1/b)*(pk/p1)) for pk in price_vector[1:]]
 
-    @property
-    def quants(self):
-        prices =[self.price(contract["title"]) for contract in self.contracts]
-        return self.quantities(prices)
 
     def equilibriate_quantities(self, price_vector, param=2):
         bigBrother["events"] = {self.title:{"contracts":{contract["title"]:0 for contract in self.contracts}}}
